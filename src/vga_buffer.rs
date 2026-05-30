@@ -1,3 +1,9 @@
+use core::fmt::{self, Arguments};
+
+use volatile::Volatile;
+use fmt::Write;
+use lazy_static::lazy_static;
+use spin::Mutex;
 pub enum Color{ 
     BLACK = 0,
     BLUE = 1,
@@ -17,7 +23,30 @@ pub enum Color{
     WHITE = 15,
 }
 
-#[derive(Clone)]
+lazy_static!{
+    pub static ref WRITER:Mutex<Writer> = Mutex::new(Writer::new());
+}
+
+#[macro_export]
+macro_rules! println{
+    () => {print!("\n")};
+    ($($arg:tt)*) =>{
+        $crate::print!("{}\n", format_args!($($arg)*))
+    };
+}
+#[macro_export]
+macro_rules! print{
+    ($($arg:tt)*) =>{
+        $crate::vga_buffer::_print(format_args!($($arg)*))
+    };
+}
+
+pub fn _print(fmt_args: Arguments){ 
+    use fmt::Write;
+    WRITER.lock().write_fmt(fmt_args).unwrap();
+}
+
+#[derive(Copy,Clone)]
 pub struct ColorCode(u8);
 
 impl ColorCode{ 
@@ -30,6 +59,7 @@ impl ColorCode{
 
 
 #[repr(C)]
+#[derive(Copy,Clone)]
 pub struct ScreenChar{ 
     ascii_char: u8,
     color_code: ColorCode,
@@ -49,30 +79,36 @@ const BUFFER_WIDTH:usize = 80;
 const BUFFER_HEIGHT:usize = 25;
 
 pub struct Buffer{ 
-    chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
 
 pub struct Writer{ 
     column_position: usize,
-    row_position: usize,
     color_code: ColorCode,
     screen_buffer: &'static mut Buffer,
+}
+
+
+impl Write for Writer{
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_string(s);
+        Ok(())
+    }
 }
 
 impl Writer{
     pub fn new()->Self{
         Writer{
             column_position:0,
-            row_position:0,
             screen_buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
             color_code:ColorCode::new(Color::BLACK, Color::WHITE),
         }
     }
      
 
-    pub fn write(&mut self, char:ScreenChar){ 
-        match char.ascii_char{
+    pub fn write_byte(&mut self, char:u8){ 
+        match char{
             b'\n' =>{
                 self.new_line()
             },
@@ -80,21 +116,50 @@ impl Writer{
                 if(BUFFER_WIDTH <= self.column_position){
                     self.new_line();
                 }
-                self.screen_buffer.chars[self.row_position][self.column_position] = char;
+
+                self.screen_buffer.chars[BUFFER_HEIGHT-1][self.column_position].write(
+                    ScreenChar::new(char, self.color_code)
+                );
                 self.column_position+=1;
             }
 
         }
-        //self.vga_buffer.offset(self.offset); //= char.char;
     }
 
     pub fn new_line(&mut self){
-        self.row_position += 1;
+
+        for row in 1..BUFFER_HEIGHT{
+            for col in 0..BUFFER_WIDTH{
+                let char = self.screen_buffer.chars[row][col].read();
+                self.screen_buffer.chars[row-1][col].write(char);
+            }
+        }
+        self.clear_row();
         self.column_position = 0;
     }
-    pub fn write_str(&mut self, s:&str){
+
+    pub fn clear_row(&mut self){
+        for col in 0..BUFFER_WIDTH{
+            self.screen_buffer.chars[BUFFER_HEIGHT-1][col].write(
+                ScreenChar{
+                    ascii_char:b' ',
+                    color_code:self.color_code,
+                }
+            );
+        }
+    }
+    pub fn write_string(&mut self, s:&str){
         for b in s.bytes(){
-            self.write(ScreenChar::new(b, self.color_code.clone()));
+
+            match b{ 
+                0x20..=0x7e | b'\n' => {
+                    self.write_byte(b);
+                }
+                _ => {
+                    self.write_byte(0xfe);
+                }
+            }
+
         }
     }
 

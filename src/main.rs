@@ -2,26 +2,23 @@
 #![no_main]
 
 use core::panic::PanicInfo;
-
-use crate::vga_buffer::{Color, ColorCode, Writer};
+use crate::vga_buffer::{Color, ColorCode, Writer };
+use core::fmt::Write;
 mod vga_buffer;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> !{
+    println!("{}", _info);
     loop{}
 }
 
 
 
-
-static HELLO: &[u8] = b"Hello World!";
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> !{
 
-    let mut writer = Writer::new();
-    writer.set_color_code(ColorCode::new(Color::BLACK, Color::BLUE));
-
-        
+    println!("Hello World\n cool coolc oocl {}", 2);
+    panic!("Help");
     loop{ 
     }
 }
