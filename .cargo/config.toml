@@ -1,6 +1,9 @@
 [build]
 target = "x86_64-Operating_System.json"
 
+[target.'cfg(target_os = "none")']
+runner = "bootimage runner"
+
 [unstable]
 json-target-spec = true
 build-std = ["core", "compiler_builtins"]
