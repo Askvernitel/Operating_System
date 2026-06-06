@@ -11,20 +11,44 @@ use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
 mod vga_buffer;
 mod serial;
 
+
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> !{
     println!("{}", _info);
+    //exit_qemu(QemuExitCode::FAILED);
+
     loop{}
 }
+
+#[cfg(test)]
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> !{
+    serial_println!("Fancy formatting [error]\n");
+    serial_println!("Error: {}\n", _info);
+    exit_qemu(QemuExitCode::FAILED);
+    loop{}
+}
+
 #[cfg(test)]
 pub fn test_runner(tests: &[&dyn Fn()]){
-    println!("Running {} Tests Yippie", tests.len());
 
     for test in tests{ 
         test();
     }
     exit_qemu(QemuExitCode::SUCCESS);
 }
+
+#[test_case]
+pub fn test_case_1(){ 
+    //serial_println!("Kill Yourself\n\n\n\n");
+//    assert_eq!(1, 0);
+
+}
+trait Testable{ 
+    fn run(&self) -> ();
+}
+
 
 #[repr(u32)]
 pub enum QemuExitCode{

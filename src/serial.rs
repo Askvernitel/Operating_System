@@ -22,16 +22,16 @@ pub fn _print(args: Arguments){
 #[macro_export]
 macro_rules! serial_println{
     ()=>{
-        $crate::serial::serial_print!("\n");
+        $crate::serial_print!("\n");
     };
     ($($arg:tt)*)=>{
-        $crate::serial::serial_print!("{}\n", format_args!($($arg)*))
+        $crate::serial_print!("{}\n", format_args!($($arg)*));
     }
 }
 
 #[macro_export]
 macro_rules! serial_print{
     ($($arg:tt)*)=>{
-        $crate::serial::_print(format_args!($($arg)*))
+        $crate::serial::_print(format_args!($($arg)*));
     }
 }
