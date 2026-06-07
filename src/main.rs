@@ -6,7 +6,7 @@
 
 
 use core::{panic::PanicInfo};
-use crate::vga_buffer::{Color, ColorCode, Writer };
+use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
 mod vga_buffer;
 mod serial;
@@ -31,22 +31,48 @@ fn panic(_info: &PanicInfo) -> !{
 }
 
 #[cfg(test)]
-pub fn test_runner(tests: &[&dyn Fn()]){
-
+pub fn test_runner(tests: &[&dyn Testable]){
+    serial_println!("Running {} Tests", tests.len());
     for test in tests{ 
-        test();
+        test.run();
     }
     exit_qemu(QemuExitCode::SUCCESS);
 }
 
 #[test_case]
-pub fn test_case_1(){ 
-    //serial_println!("Kill Yourself\n\n\n\n");
-//    assert_eq!(1, 0);
-
+pub fn test_println(){ 
+    println!("Testing VGA Printing");
 }
+
+
+#[test_case]
+pub fn test_println_bulk(){
+    for i in 1..300{
+        println!("Testing VGA Printing {}", i);
+    }
+}
+
+
+#[test_case]
+pub fn test_println_output(){
+    let write_str = "Hello World How Are You?";
+    println!("{}", write_str);
+    for (i, val) in write_str.chars().enumerate(){
+        let out = WRITER.lock().screen_buffer.chars[BUFFER_HEIGHT-2][i].read().ascii_char as char;
+        assert_eq!(val, out);
+    }
+}
+
 trait Testable{ 
     fn run(&self) -> ();
+}
+
+impl<T:Fn()> Testable for T{ 
+    fn run(&self) -> () {
+        serial_print!("{}...\t", core::any::type_name::<T>());
+        self();
+        serial_println!("[OK]");
+    }
 }
 
 

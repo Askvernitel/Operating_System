@@ -63,7 +63,7 @@ impl ColorCode{
 #[repr(C)]
 #[derive(Copy,Clone)]
 pub struct ScreenChar{ 
-    ascii_char: u8,
+    pub ascii_char: u8,
     color_code: ColorCode,
 }
 
@@ -77,18 +77,18 @@ impl ScreenChar{
 }
 
 
-const BUFFER_WIDTH:usize = 80;
-const BUFFER_HEIGHT:usize = 25;
+pub const BUFFER_WIDTH:usize = 80;
+pub const BUFFER_HEIGHT:usize = 25;
 
 pub struct Buffer{ 
-    chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    pub chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
 
 pub struct Writer{ 
     column_position: usize,
     color_code: ColorCode,
-    screen_buffer: &'static mut Buffer,
+    pub screen_buffer: &'static mut Buffer,
 }
 
 
