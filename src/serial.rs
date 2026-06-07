@@ -1,11 +1,11 @@
 
 
-use core::fmt::Arguments;
-
+use core::fmt::{self, Arguments};
+use core::{format_args};
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
 use lazy_static::lazy_static;
 use spin::Mutex;
-
+use core::default::Default;
 lazy_static!{
     pub static ref SERIAL1: Mutex<Uart16550Tty<PioBackend>> = Mutex::new(unsafe{
         Uart16550Tty::new_port(0x3f8, Config::default()).expect("failed to initialize UART")

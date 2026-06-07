@@ -1,7 +1,8 @@
-use core::fmt::{self, Arguments};
+use core::{clone::Clone, derive, fmt::{self, Arguments}, marker::Copy, format_args};
 
 use volatile::Volatile;
 use fmt::Write;
+use core::result::Result::*;
 use lazy_static::lazy_static;
 use spin::Mutex;
 pub enum Color{ 
