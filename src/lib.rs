@@ -13,6 +13,7 @@ use spin::Mutex;
 use volatile::Volatile;
 pub mod serial;
 pub mod vga_buffer;
+pub mod interrupts;
 
 #[repr(u32)]
 pub enum QemuExitCode{

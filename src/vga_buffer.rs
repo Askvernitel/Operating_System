@@ -105,7 +105,7 @@ impl Writer{
         Writer{
             column_position:0,
             screen_buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-            color_code:ColorCode::new(Color::BLACK, Color::WHITE),
+            color_code:ColorCode::new(Color::BLACK, Color::BROWN),
         }
     }
      
