@@ -5,15 +5,23 @@ edition = "2024"
 
 
 [dependencies]
-x86_64 = "0.15"
+#x86_64 = "0.15"
 uart_16550 = "0.6.0"
 bootloader = "0.9"
 volatile = "0.2.6"
 spin = "0.5.2"
 
+
+
 [dependencies.lazy_static]
 version = "1.0"
 features = ["spin_no_std"]
+
+
+[dependencies.x86_64]
+version = "0.15"
+features = ["abi_x86_interrupt"]
+
 
 [package.metadata.bootimage]
 test-args = ["-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio", "-display", "none"]

@@ -2,8 +2,8 @@
 #![cfg_attr(test, no_main)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
+#![feature(abi_x86_interrupt)]
 #![reexport_test_harness_main = "test_main"]
-
 
 
 use core::{assert_eq, iter::Iterator, ops::Fn, panic::PanicInfo, prelude::v1::test_case, format_args};
@@ -71,6 +71,9 @@ pub fn test_println_output(){
     }
 }
 
+
+
+
 pub trait Testable{ 
     fn run(&self) -> ();
 }
@@ -89,10 +92,14 @@ fn panic(info:&PanicInfo) -> !{
     test_panic_handler(info)
 }
 
+pub fn init(){
+    interrupts::init_idt();
+}
 
 #[cfg(test)]
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> !{
+    init();
     test_main();
     loop{ 
     }
