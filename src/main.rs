@@ -25,10 +25,16 @@ fn panic(_info: &PanicInfo) -> !{
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> !{
-    println!("Hello World\n cool coolc oocl {}", 2);
-
+//    println!("Hello World\n cool coolc oocl {}", 2);
+    
     Operating_System::init();
 
+
+    unsafe{
+        let addr = (0xdeadbeef as *mut u8);
+
+        println!("{}", *addr);
+    }
     x86_64::instructions::interrupts::int3();
     #[cfg(test)]
     test_main();   
