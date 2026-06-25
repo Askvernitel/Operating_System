@@ -6,7 +6,7 @@
 
 
 
-use core::{ panic::PanicInfo};
+use core::{ panic::PanicInfo, arch::asm};
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
 mod vga_buffer;
@@ -21,21 +21,21 @@ fn panic(_info: &PanicInfo) -> !{
     loop{}
 }
 
-
+pub fn get_rsp() -> u64{
+    let rsp:u64;
+    unsafe{ 
+        asm!("mov {}, rsp", out(reg) rsp)
+    }
+    rsp
+}
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> !{
-//    println!("Hello World\n cool coolc oocl {}", 2);
+    println!("Hello World\n  {}", 2);
     
     Operating_System::init();
 
-
-    unsafe{
-        let addr = (0xdeadbeef as *mut u8);
-
-        println!("{}", *addr);
-    }
-    x86_64::instructions::interrupts::int3();
+//    x86_64::instructions::interrupts::int3();
     #[cfg(test)]
     test_main();   
     loop{ 

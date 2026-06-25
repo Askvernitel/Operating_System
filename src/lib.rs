@@ -14,6 +14,7 @@ use volatile::Volatile;
 pub mod serial;
 pub mod vga_buffer;
 pub mod interrupts;
+pub mod gdt;
 
 #[repr(u32)]
 pub enum QemuExitCode{
