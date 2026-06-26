@@ -23,8 +23,7 @@ pub fn init_idt(){
 
 extern "x86-interrupt" fn breakpoint_handler(stack_frame:InterruptStackFrame){
     println!("EXCEPTION: BREAKPOINT\n{:#?}", stack_frame);
-
-    x86_64::instructions::interrupts::int3();
+    //x86_64::instructions::interrupts::int3();
 }
 
 extern "x86-interrupt" fn page_fault_handler(stack_frame:InterruptStackFrame){

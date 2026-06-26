@@ -38,6 +38,8 @@ struct Selectors{
     code_selector:SegmentSelector,
     tss_selector:SegmentSelector,
 }
+
+
 pub fn init(){ 
     use x86_64::instructions::tables::load_tss;
     use x86_64::instructions::segmentation::{CS, Segment};
