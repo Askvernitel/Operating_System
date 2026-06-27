@@ -32,12 +32,12 @@ pub fn get_rsp() -> u64{
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> !{
     println!("Hello World\n  {}", 2);
-    
     Operating_System::init();
 
 //    x86_64::instructions::interrupts::int3();
     #[cfg(test)]
     test_main();   
     loop{ 
+        print!("-");
     }
 }

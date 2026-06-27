@@ -46,7 +46,11 @@ macro_rules! print{
 
 pub fn _print(fmt_args: Arguments){ 
     use fmt::Write;
-    WRITER.lock().write_fmt(fmt_args).unwrap();
+
+    use x86_64::instructions::interrupts;
+    interrupts::without_interrupts(|| {
+        WRITER.lock().write_fmt(fmt_args).unwrap();
+    });
 }
 
 #[derive(Copy,Clone)]
