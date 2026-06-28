@@ -16,7 +16,11 @@ lazy_static!{
 #[doc(hidden)]
 pub fn _print(args: Arguments){ 
     use core::fmt::Write;
-    SERIAL1.lock().write_fmt(args).expect("Printing failed");
+
+    use x86_64::instructions::interrupts;
+    interrupts::without_interrupts(|| {
+        SERIAL1.lock().write_fmt(args).expect("Serial printing failed");
+    })     
 }
 
 #[macro_export]
