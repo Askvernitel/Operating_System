@@ -65,11 +65,15 @@ pub fn test_println_bulk(){
 #[test_case]
 pub fn test_println_output(){
     let write_str = "Hello World How Are You?";
-    println!("{}", write_str);
-    for (i, val) in write_str.chars().enumerate(){
-        let out = WRITER.lock().screen_buffer.chars[BUFFER_HEIGHT-2][i].read().ascii_char as char;
-        assert_eq!(val, out);
-    }
+    use x86_64::instructions::interrupts;
+    interrupts::without_interrupts(||{
+        let mut writer = WRITER.lock();
+        writeln!(writer, "\n{}",write_str).expect("writeln failed");
+        for (i, val) in write_str.chars().enumerate(){
+            let out = writer.screen_buffer.chars[BUFFER_HEIGHT-2][i].read().ascii_char as char;
+            assert_eq!(val, out);
+        }
+    });
 }
 
 
