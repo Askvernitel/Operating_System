@@ -12,7 +12,6 @@ lazy_static!{
     });
 }
 
-
 #[doc(hidden)]
 pub fn _print(args: Arguments){ 
     use core::fmt::Write;

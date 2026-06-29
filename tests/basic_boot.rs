@@ -6,14 +6,14 @@
 
 use core::panic::PanicInfo;
 
-use Operating_System::println;
+use Operating_System::{hlt_loop, println};
 
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> !{
     test_main();
-
-    loop{}
+    
+    hlt_loop();
 }
 
 

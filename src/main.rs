@@ -8,6 +8,7 @@
 
 use core::{ panic::PanicInfo, arch::asm};
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
+use Operating_System::hlt_loop;
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
 mod vga_buffer;
 mod serial;
@@ -17,8 +18,8 @@ mod serial;
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> !{
     println!("{}", _info);
-
-    loop{}
+    
+    hlt_loop();
 }
 
 pub fn get_rsp() -> u64{
@@ -37,7 +38,5 @@ pub extern "C" fn _start() -> !{
 //    x86_64::instructions::interrupts::int3();
     #[cfg(test)]
     test_main();   
-    loop{ 
-        print!("-");
-    }
+    hlt_loop(); 
 }
