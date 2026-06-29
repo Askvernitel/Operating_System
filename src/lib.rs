@@ -5,7 +5,6 @@
 #![feature(abi_x86_interrupt)]
 #![reexport_test_harness_main = "test_main"]
 
-
 use core::{assert_eq, iter::Iterator, ops::Fn, panic::PanicInfo, prelude::v1::test_case, format_args};
 use core::fmt::Write;
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
@@ -32,7 +31,7 @@ pub fn exit_qemu(qemu_exit_code:QemuExitCode){
     }
 }
 
-pub fn hlt_loop(){
+pub fn hlt_loop() -> !{
     loop{
         x86_64::instructions::hlt();
     }
@@ -117,5 +116,3 @@ pub extern "C" fn _start() -> !{
     test_main();
     hlt_loop();
 }
-
-

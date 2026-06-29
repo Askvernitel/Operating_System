@@ -15,6 +15,7 @@ pub static PICS:spin::Mutex<ChainedPics> = spin::Mutex::new(unsafe{ChainedPics::
 #[repr(u8)]
 pub enum InterruptIndex{ 
     TIMER = PIC_1_OFFSET,
+    KEYBOARD,
 }
 
 impl InterruptIndex{
@@ -37,6 +38,7 @@ lazy_static!{
         }
         //PIC
         idt[InterruptIndex::TIMER.as_u8()].set_handler_fn(timer_interrupt_handler);
+        idt[InterruptIndex::KEYBOARD.as_u8()].set_handler_fn(keyboard_interrupt_handler);
         //idt.page_fault.set_handler_fn(page_fault_handler);
         idt
     };
@@ -63,6 +65,39 @@ extern "x86-interrupt" fn timer_interrupt_handler(stack_frame:InterruptStackFram
     print!(":");
     unsafe{
         PICS.lock().notify_end_of_interrupt(InterruptIndex::TIMER.as_u8());
+    }
+}
+extern "x86-interrupt" fn keyboard_interrupt_handler(stack_frame:InterruptStackFrame){ 
+
+    use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet1};
+    use spin::Mutex;
+    use x86_64::instructions::port::Port;
+
+    //static KEYBOARD: Mutex<Keyboard<layouts::Us104Key, ScancodeSet1> =
+     //   Mutex::new
+
+    let mut port = Port::new(0x60);
+    let scancode:u8 = unsafe {port.read()};
+
+    let ascii_char = match scancode{
+        0x02 => Some('1'),
+        0x03 => Some('2'),
+        0x04 => Some('3'),
+        0x05 => Some('4'),
+        0x06 => Some('5'),
+        0x07 => Some('6'),
+        0x08 => Some('7'),
+        0x09 => Some('8'),
+        0x0a => Some('9'),
+        0x0b => Some('0'),
+        _ => None,
+    };
+    
+    if let Some(key) = ascii_char{
+        print!("{}", key);
+    }
+    unsafe{
+        PICS.lock().notify_end_of_interrupt(InterruptIndex::KEYBOARD.as_u8());
     }
 }
 
