@@ -84,6 +84,7 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(stack_frame:InterruptStackF
     let scancode:u8 = unsafe {port.read()};
 
     if let Ok(Some(key_event)) = keyboard.add_byte(scancode){
+//        print!("{:#?}",key_event);
         if let Some(key) = keyboard.process_keyevent(key_event){
             match key{
                 DecodedKey::Unicode(ch) => print!("{}", ch),
