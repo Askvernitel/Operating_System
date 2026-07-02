@@ -5,6 +5,7 @@ use spin;
 use crate::print;
 use crate::println;
 use crate::gdt;
+use x86_64::structures::idt::PageFaultErrorCode;
 
 pub const PIC_1_OFFSET:u8 = 32;
 pub const PIC_2_OFFSET:u8 = PIC_1_OFFSET + 8;
@@ -32,6 +33,7 @@ lazy_static!{
     pub static ref IDT:InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
+        idt.page_fault.set_handler_fn(page_fault_handler);
         unsafe{
             idt.double_fault.set_handler_fn(double_fault_handler)
                 .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
@@ -52,7 +54,7 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame:InterruptStackFrame){
     println!("EXCEPTION: BREAKPOINT\n{:#?}", stack_frame);
     //x86_64::instructions::interrupts::int3();
 }
-extern "x86-interrupt" fn page_fault_handler(stack_frame:InterruptStackFrame){
+extern "x86-interrupt" fn page_fault_handler(stack_frame:InterruptStackFrame, _error_code:PageFaultErrorCode){
     println!("EXCEPTION: PAGE FAULT\n {:#?}", stack_frame);
 }
 extern "x86-interrupt" fn double_fault_handler(stack_frame:InterruptStackFrame, _error_code:u64) -> !{ 
