@@ -35,9 +35,9 @@ pub extern "C" fn _start() -> !{
     println!("Hello World\n  {}", 2);
     Operating_System::init();
     
-    let invalid_mem = 0xdeadbeef as *mut u64;
+ //   let invalid_mem = 0xdeadbeef as *mut u64;
     unsafe{
-        println!("{}", *invalid_mem);
+//        println!("{}", *invalid_mem);
     }
 //    x86_64::instructions::interrupts::int3();
     #[cfg(test)]
