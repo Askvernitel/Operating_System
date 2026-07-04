@@ -2,6 +2,7 @@ use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 use lazy_static::lazy_static;
 use pic8259::ChainedPics;
 use spin;
+use crate::hlt_loop;
 use crate::print;
 use crate::println;
 use crate::gdt;
@@ -16,8 +17,7 @@ pub static PICS:spin::Mutex<ChainedPics> = spin::Mutex::new(unsafe{ChainedPics::
 #[repr(u8)]
 pub enum InterruptIndex{ 
     TIMER = PIC_1_OFFSET,
-    KEYBOARD,
-}
+    KEYBOARD, }
 
 impl InterruptIndex{
     fn as_u8(self) -> u8{
@@ -55,7 +55,13 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame:InterruptStackFrame){
     //x86_64::instructions::interrupts::int3();
 }
 extern "x86-interrupt" fn page_fault_handler(stack_frame:InterruptStackFrame, _error_code:PageFaultErrorCode){
-    println!("EXCEPTION: PAGE FAULT\n {:#?}", stack_frame);
+
+    use x86_64::registers::control::Cr2;
+    println!("EXCEPTION: PAGE FAULT\n {:#?}\n", stack_frame);
+    println!("Accessed Address: {:?}\n", Cr2::read());
+    println!("Error Code: {:?}\n", _error_code);
+
+    hlt_loop();
 }
 extern "x86-interrupt" fn double_fault_handler(stack_frame:InterruptStackFrame, _error_code:u64) -> !{ 
     panic!("EXCEPTION: Double Fault Handler\n{:#?}", stack_frame);

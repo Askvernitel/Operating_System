@@ -32,12 +32,19 @@ pub fn get_rsp() -> u64{
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> !{
-    println!("Hello World\n  {}", 2);
+//    println!("Hello World\n  {}", 2);
     Operating_System::init();
     
- //   let invalid_mem = 0xdeadbeef as *mut u64;
+
+    use x86_64::registers::control::Cr3;
+    let (level_4_table, _) = Cr3::read();
+
+
+    println!("level 4 page table: {:?}", level_4_table.start_address());
+    let invalid_mem = 0x206ada as *mut u8;
     unsafe{
-//        println!("{}", *invalid_mem);
+        println!("{}", *invalid_mem);
+        //invalid_mem.write(42);
     }
 //    x86_64::instructions::interrupts::int3();
     #[cfg(test)]
