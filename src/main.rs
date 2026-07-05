@@ -9,6 +9,7 @@
 use core::{ panic::PanicInfo, arch::asm};
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use Operating_System::hlt_loop;
+use bootloader::{BootInfo, entry_point};
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
 mod vga_buffer;
 mod serial;
@@ -30,8 +31,9 @@ pub fn get_rsp() -> u64{
     rsp
 }
 
-#[unsafe(no_mangle)]
-pub extern "C" fn _start() -> !{
+entry_point!(kernel_main);
+
+fn kernel_main(boot_info: &'static BootInfo) -> !{
 //    println!("Hello World\n  {}", 2);
     Operating_System::init();
     
@@ -41,11 +43,11 @@ pub extern "C" fn _start() -> !{
 
 
     println!("level 4 page table: {:?}", level_4_table.start_address());
-    let invalid_mem = 0x206ada as *mut u8;
-    unsafe{
-        println!("{}", *invalid_mem);
+//    let invalid_mem = 0x206ada as *mut u8;
+  //  unsafe{
+ //       println!("{}", *invalid_mem);
         //invalid_mem.write(42);
-    }
+   // }
 //    x86_64::instructions::interrupts::int3();
     #[cfg(test)]
     test_main();   

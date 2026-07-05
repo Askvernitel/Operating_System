@@ -10,12 +10,17 @@ use core::fmt::Write;
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use spin::Mutex;
 use volatile::Volatile;
+
+#[cfg(test)]
+use bootloader::{BootInfo, entry_point};
+
 pub mod serial;
 pub mod vga_buffer;
 pub mod interrupts;
 pub mod gdt;
 
-#[repr(u32)]
+
+#[repr(u32)] 
 pub enum QemuExitCode{
     SUCCESS = 0x10,
     FAILED = 0x11,
@@ -110,8 +115,11 @@ pub fn init(){
 }
 
 #[cfg(test)]
-#[unsafe(no_mangle)]
-pub extern "C" fn _start() -> !{
+entry_point!(kernel_main);
+
+
+#[cfg(test)]
+pub fn kernel_main(_boot_info: &'static BootInfo) -> !{
     init();
     test_main();
     hlt_loop();
