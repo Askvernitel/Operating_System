@@ -14,6 +14,7 @@ use volatile::Volatile;
 #[cfg(test)]
 use bootloader::{BootInfo, entry_point};
 
+pub mod memory;
 pub mod serial;
 pub mod vga_buffer;
 pub mod interrupts;
