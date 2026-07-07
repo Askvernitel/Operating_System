@@ -5,6 +5,13 @@
 #![feature(abi_x86_interrupt)]
 #![reexport_test_harness_main = "test_main"]
 
+
+
+use x86_64::{
+    VirtAddr,
+    PhysAddr,
+};
+use memory::inner_translate_addr;
 use core::{assert_eq, iter::Iterator, ops::Fn, panic::PanicInfo, prelude::v1::test_case, format_args};
 use core::fmt::Write;
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
@@ -57,6 +64,10 @@ pub fn test_runner(tests: &[&dyn Testable]){
         test.run();
     }
     exit_qemu(QemuExitCode::SUCCESS);
+}
+
+pub unsafe fn translate_addr(addr:VirtAddr, phys_memory_offset:VirtAddr) -> Option<PhysAddr>{ 
+    inner_translate_addr(addr, phys_memory_offset)
 }
 
 #[test_case]
@@ -116,11 +127,11 @@ pub fn init(){
 }
 
 #[cfg(test)]
-entry_point!(kernel_main);
+entry_point!(test_kernel_main);
 
 
 #[cfg(test)]
-pub fn kernel_main(_boot_info: &'static BootInfo) -> !{
+pub fn test_kernel_main(_boot_info: &'static BootInfo) -> !{
     init();
     test_main();
     hlt_loop();

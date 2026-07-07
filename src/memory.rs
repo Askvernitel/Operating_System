@@ -2,8 +2,9 @@
 use x86_64::{
     structures::paging::PageTable,
     VirtAddr,
+    PhysAddr
 };
-
+use core::{option::Option};
 
 
 pub unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static mut PageTable{
@@ -16,4 +17,17 @@ pub unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static
     let page_table_ptr: *mut PageTable = virt.as_mut_ptr();
 
     unsafe {&mut *page_table_ptr}
+}
+
+
+
+pub unsafe fn inner_translate_addr(addr:VirtAddr, physical_memory_offset:VirtAddr) -> Option<PhysAddr>{ 
+
+    let indices = [addr.p1_index(), addr.p2_index(), addr.p3_index(), addr.p4_index()];
+    let level_4_table = active_level_4_table(physical_memory_offset);
+
+
+    for idx in indices{ 
+    }
+    Some(PhysAddr::new(123)) 
 }
