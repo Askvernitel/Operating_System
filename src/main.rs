@@ -10,7 +10,7 @@ use x86_64::{
 };
 
 use core::{ panic::PanicInfo, arch::asm};
-use Operating_System::memory::*;
+use Operating_System::{memory::*, translate_addr};
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use Operating_System::hlt_loop;
 use bootloader::{BootInfo, entry_point};
@@ -38,21 +38,30 @@ pub fn get_rsp() -> u64{
 entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static BootInfo) -> !{
-//    println!("Hello World\n  {}", 2);
+    println!("Hello World\n  {}", 2);
     Operating_System::init();
     
-
+    
     //use x86_64::registers::control::Cr3;
     //let (level_4_table, _) = Cr3::read();
+    
+    let addresses = [
+        0x8000,
+        0x123123123,
+    ];
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
-    let l4_table = unsafe { active_level_4_table(phys_mem_offset)};
+    /*let l4_table = unsafe { active_level_4_table(phys_mem_offset)};*/
 
-
-    for (i, entry) in l4_table.iter().enumerate(){
+    for &addr in &addresses{
+        let virt = VirtAddr::new(addr);
+        let phys = unsafe{translate_addr(VirtAddr::new(addr), phys_mem_offset)};
+        println!("{:?} _ {:?}", virt, phys);
+    }
+    /*for (i, entry) in l4_table.iter().enumerate(){
         if !entry.is_unused(){
             println!("L4 entry: {}, {:?}", i, entry);
         }
-    }
+    }*/
 
     //println!("level 4 page table: {:?}", level_4_table.start_address());
 //    let invalid_mem = 0x206ada as *mut u8;
