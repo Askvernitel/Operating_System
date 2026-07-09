@@ -48,6 +48,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     let addresses = [
         0x8000,
         0x123123123,
+        boot_info.physical_memory_offset,
     ];
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
     /*let l4_table = unsafe { active_level_4_table(phys_mem_offset)};*/
@@ -57,6 +58,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
         let phys = unsafe{translate_addr(VirtAddr::new(addr), phys_mem_offset)};
         println!("{:?} _ {:?}", virt, phys);
     }
+
+
     /*for (i, entry) in l4_table.iter().enumerate(){
         if !entry.is_unused(){
             println!("L4 entry: {}, {:?}", i, entry);
