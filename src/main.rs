@@ -7,10 +7,11 @@
 
 use x86_64::{
     VirtAddr,
+    structures::paging::Translate
 };
 
 use core::{ panic::PanicInfo, arch::asm};
-use Operating_System::{memory::*, translate_addr};
+use Operating_System::{memory::{self, *}, translate_addr};
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use Operating_System::hlt_loop;
 use bootloader::{BootInfo, entry_point};
@@ -50,13 +51,21 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
         0x123123123,
         boot_info.physical_memory_offset,
     ];
+
+
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
+
+    let mapper = unsafe { memory::init(phys_mem_offset)};
+    
+
     /*let l4_table = unsafe { active_level_4_table(phys_mem_offset)};*/
 
     for &addr in &addresses{
         let virt = VirtAddr::new(addr);
-        let phys = unsafe{translate_addr(VirtAddr::new(addr), phys_mem_offset)};
-        println!("{:?} _ {:?}", virt, phys);
+        //let phys = unsafe{translate_addr(VirtAddr::new(addr), phys_mem_offset)};
+
+        let phys = mapper.translate_addr(virt);
+        println!("{:?} -> {:?}", virt, phys);
     }
 
 
