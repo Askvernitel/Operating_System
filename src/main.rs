@@ -7,7 +7,6 @@
 
 use x86_64::{
     VirtAddr,
-    structures::paging::Translate
 };
 
 use core::{ panic::PanicInfo, arch::asm};
@@ -39,6 +38,7 @@ pub fn get_rsp() -> u64{
 entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static BootInfo) -> !{
+    use x86_64::{structures::paging::Translate};
     println!("Hello World\n  {}", 2);
     Operating_System::init();
     

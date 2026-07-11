@@ -2,6 +2,7 @@
 use x86_64::{
     structures::paging::PageTable,
     structures::paging::OffsetPageTable,
+    structures::paging::{Page, PhysFrame, Mapper, Size4KiB, FrameAllocator},
     VirtAddr,
     PhysAddr
 };
@@ -51,4 +52,13 @@ pub unsafe fn inner_translate_addr(addr:VirtAddr, physical_memory_offset:VirtAdd
     }
 
     Some(frame.start_address() + u64::from(addr.page_offset()))
+}
+
+
+pub fn create_example_mapping(
+    page: Page,
+    mapper: &mut OffsetPageTable,
+    frame_allocator: &mut impl FrameAllocator<Size4KiB>
+    ){ 
+
 }
