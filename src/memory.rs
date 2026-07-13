@@ -22,10 +22,10 @@ pub unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static
 }
 
 
-pub unsafe fn init(physical_memory_offset: VirtAddr){
+pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static>{
     unsafe{ 
         let level_4_table = active_level_4_table(physical_memory_offset);
-        OffsetPageTable::new(level_4_table, physical_memory_offset);
+        OffsetPageTable::new(level_4_table, physical_memory_offset)
     }
 }
 
@@ -58,7 +58,13 @@ pub unsafe fn inner_translate_addr(addr:VirtAddr, physical_memory_offset:VirtAdd
 pub fn create_example_mapping(
     page: Page,
     mapper: &mut OffsetPageTable,
-    frame_allocator: &mut impl FrameAllocator<Size4KiB>
+    frame_allocator: &mut impl FrameAllocator<Size4KiB>,
     ){ 
+    use x86_64::structures::paging::PageTableFlags as Flags;
 
+    let frame = PhysFrame::containing_address(PhysAddr::new(0xb8000));
+    let flags = Flags::PRESENT | Flags::WRITABLE;
+
+    let map_to_result = unsafe { 
+    }
 }
