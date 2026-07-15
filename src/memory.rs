@@ -8,6 +8,14 @@ use x86_64::{
 };
 use core::{option::Option, option::Option::Some, option::Option::None};
 
+pub struct EmptyFrameAllocator;
+
+unsafe impl FrameAllocator<Size4KiB> for EmptyFrameAllocator{
+    fn allocate_frame(&mut self) -> Option<PhysFrame>{
+        None
+    }
+}
+
 
 pub unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static mut PageTable{
     use x86_64::registers::control::Cr3;
