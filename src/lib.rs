@@ -12,11 +12,8 @@ use x86_64::{
     PhysAddr,
 };
 use memory::inner_translate_addr;
-use core::{assert_eq, iter::Iterator, ops::Fn, panic::PanicInfo, prelude::v1::test_case, format_args};
-use core::fmt::Write;
+use core::{ops::Fn, panic::PanicInfo, prelude::v1::test_case, format_args};
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
-use spin::Mutex;
-use volatile::Volatile;
 
 #[cfg(test)]
 use bootloader::{BootInfo, entry_point};

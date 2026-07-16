@@ -1,7 +1,6 @@
 
 
 use core::fmt::{self, Arguments};
-use core::{format_args};
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
 use lazy_static::lazy_static;
 use spin::Mutex;

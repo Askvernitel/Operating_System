@@ -59,11 +59,9 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     let mapper = unsafe { memory::init(phys_mem_offset)};
     
 
-    /*let l4_table = unsafe { active_level_4_table(phys_mem_offset)};*/
 
     for &addr in &addresses{
         let virt = VirtAddr::new(addr);
-        //let phys = unsafe{translate_addr(VirtAddr::new(addr), phys_mem_offset)};
 
         let phys = mapper.translate_addr(virt);
         println!("{:?} -> {:?}", virt, phys);
