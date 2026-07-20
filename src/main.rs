@@ -43,9 +43,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     Operating_System::init();
     
     
-    //use x86_64::registers::control::Cr3;
-    //let (level_4_table, _) = Cr3::read();
-    
+   
     let addresses = [
         0x8000,
         0x0000,
@@ -69,20 +67,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
         println!("{:?} -> {:?}", virt, phys);
     }
 
-
-    /*for (i, entry) in l4_table.iter().enumerate(){
-        if !entry.is_unused(){
-            println!("L4 entry: {}, {:?}", i, entry);
-        }
-    }*/
-
-    //println!("level 4 page table: {:?}", level_4_table.start_address());
-//    let invalid_mem = 0x206ada as *mut u8;
-  //  unsafe{
- //       println!("{}", *invalid_mem);
-        //invalid_mem.write(42);
-   // }
-//    x86_64::instructions::interrupts::int3();
     #[cfg(test)]
     test_main();   
     hlt_loop(); 
