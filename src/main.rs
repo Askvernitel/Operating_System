@@ -39,11 +39,10 @@ entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static BootInfo) -> !{
     use x86_64::{structures::paging::Translate};
-    println!("Hello World\n  {}", 2);
+    use x86_64::{structures::paging::Page, VirtAddr};
     Operating_System::init();
     
-    
-   
+
     let addresses = [
         0x8000,
         0x0000,
@@ -51,12 +50,19 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
         boot_info.physical_memory_offset,
     ];
 
-
-    let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
-
-
-    let mut mapper = unsafe { memory::init(phys_mem_offset)};
+    let phys_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
+    let mut mapper = unsafe { memory::init(phys_memory_offset)};
     let mut frame_allocator = memory::EmptyFrameAllocator;
+
+    let page = Page::containing_address(VirtAddr::new(0));
+    memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
+    
+
+    let page_ptr:*mut u64 = page.start_address().as_mut_ptr();
+    
+    unsafe { page_ptr.offset(500).write_volatile(0x_f021_f077_f065_f04e)};
+
+    /*
 
 
 
@@ -65,8 +71,9 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
 
         let phys = mapper.translate_addr(virt);
         println!("{:?} -> {:?}", virt, phys);
-    }
+    }*/
 
+    println!("Hello World\n  {}", 2);
     #[cfg(test)]
     test_main();   
     hlt_loop(); 
