@@ -72,7 +72,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
         let phys = mapper.translate_addr(virt);
         println!("{:?} -> {:?}", virt, phys);
     }*/
-
     println!("Hello World\n  {}", 2);
     #[cfg(test)]
     test_main();   
