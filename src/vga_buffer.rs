@@ -5,6 +5,7 @@ use fmt::Write;
 use core::result::Result::*;
 use lazy_static::lazy_static;
 use spin::Mutex;
+
 pub enum Color{ 
     BLACK = 0,
     BLUE = 1,

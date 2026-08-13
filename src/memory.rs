@@ -6,7 +6,12 @@ use x86_64::{
     VirtAddr,
     PhysAddr
 };
+
+use bootloader::{bootinfo::MemoryMap, BootInfo};
+use bootloader::bootinfo::MemoryRegionType;
 use core::{option::Option, option::Option::Some, option::Option::None};
+
+use crate::println;
 
 pub struct EmptyFrameAllocator;
 
@@ -16,6 +21,35 @@ unsafe impl FrameAllocator<Size4KiB> for EmptyFrameAllocator{
     }
 }
 
+
+pub struct BootInfoFrameAllocator{
+    memory_map:&'static MemoryMap,
+    next: usize,
+}
+impl BootInfoFrameAllocator{ 
+    pub unsafe fn init(memory_map:&'static MemoryMap)->Self{
+        BootInfoFrameAllocator{
+            memory_map,
+            next:0,
+        }
+    }
+
+    pub fn usable_frames(&self) -> impl Iterator<Item = PhysFrame>{ 
+        let regions = self.memory_map.iter();
+        println!("{:?}", regions);
+        regions.filter(|r| r.region_type == MemoryRegionType::Usable)
+        .map(|r| r.range.start_addr()..r.range.end_addr())
+        .flat_map(|r| r.step_by(4096))
+        .map(|addr| PhysFrame::containing_address(PhysAddr::new(addr)))
+    }
+}
+unsafe impl FrameAllocator<Size4KiB> for BootInfoFrameAllocator{
+    fn allocate_frame(&mut self) -> Option<PhysFrame>{
+        let phys_frame = self.usable_frames().nth(self.next);
+        self.next+=1; 
+        phys_frame
+    }   
+}
 
 pub unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static mut PageTable{
     use x86_64::registers::control::Cr3;
