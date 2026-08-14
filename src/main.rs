@@ -4,6 +4,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 
+use alloc::boxed::Box;
 use x86_64::{
     VirtAddr,
 };
@@ -14,9 +15,9 @@ use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use Operating_System::hlt_loop;
 use bootloader::{BootInfo, entry_point};
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
+extern crate alloc;
 mod vga_buffer;
 mod serial;
-
 
 
 #[panic_handler]
@@ -41,7 +42,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     use x86_64::{structures::paging::Page, VirtAddr};
     Operating_System::init();
     
-
+    let x = Box::new(10);
     let addresses = [
         0x8000,
         0x0000,

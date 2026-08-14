@@ -7,6 +7,8 @@
 
 
 
+extern crate alloc;
+
 use x86_64::{
     VirtAddr,
     PhysAddr,
@@ -14,10 +16,10 @@ use x86_64::{
 use memory::inner_translate_addr;
 use core::{ops::Fn, panic::PanicInfo, prelude::v1::test_case, format_args};
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
-
 #[cfg(test)]
 use bootloader::{BootInfo, entry_point};
 
+pub mod allocator;
 pub mod memory;
 pub mod serial;
 pub mod vga_buffer;
