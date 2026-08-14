@@ -4,7 +4,6 @@
 #![reexport_test_harness_main = "test_main"]
 
 
-use alloc::boxed::Box;
 use x86_64::{
     VirtAddr,
 };
@@ -15,7 +14,6 @@ use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use Operating_System::hlt_loop;
 use bootloader::{BootInfo, entry_point};
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
-extern crate alloc;
 mod vga_buffer;
 mod serial;
 
@@ -42,7 +40,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     use x86_64::{structures::paging::Page, VirtAddr};
     Operating_System::init();
     
-    let x = Box::new(10);
+    //let x = Box::new(10);
     let addresses = [
         0x8000,
         0x0000,
@@ -54,17 +52,18 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     let mut mapper = unsafe { memory::init(phys_memory_offset)};
     let mut frame_allocator = unsafe{ memory::BootInfoFrameAllocator::init(&boot_info.memory_map) };
 
-    let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
+    init_heap(&mut mapper, &mut frame_allocator);
+    //let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
 
 
 
-    memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
+//    memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
     
-
+/* 
     let page_ptr:*mut u64 = page.start_address().as_mut_ptr();
     
     unsafe { page_ptr.offset(400).write_volatile(0x_f021_f077_f065_f04e)};
-
+*/
     /*
 
 

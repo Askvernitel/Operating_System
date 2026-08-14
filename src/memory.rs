@@ -1,10 +1,6 @@
 
 use x86_64::{
-    structures::paging::PageTable,
-    structures::paging::OffsetPageTable,
-    structures::paging::{Page, PhysFrame, Mapper, Size4KiB, FrameAllocator},
-    VirtAddr,
-    PhysAddr
+    structures::paging::{mapper::MapToError, FrameAllocator, Mapper, OffsetPageTable, Page, PageTable, PageTableFlags, PhysFrame, Size4KiB}, PhysAddr, VirtAddr
 };
 
 use bootloader::{bootinfo::MemoryMap, BootInfo};
@@ -12,6 +8,11 @@ use bootloader::bootinfo::MemoryRegionType;
 use core::{option::Option, option::Option::Some, option::Option::None};
 
 use crate::println;
+
+
+
+pub const HEAP_START:usize = 0x4444_4444_0000;
+pub const HEAP_SIZE:usize = 100*1024;
 
 pub struct EmptyFrameAllocator;
 
@@ -95,9 +96,31 @@ pub unsafe fn inner_translate_addr(addr:VirtAddr, physical_memory_offset:VirtAdd
 
     Some(frame.start_address() + u64::from(addr.page_offset()))
 }
+pub fn init_heap(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<(),MapToError<Size4KiB>>{
 
+    let page_range = {
+        let heap_start = VirtAddr::new(HEAP_START as u64);
+        let heap_end =  heap_start + (HEAP_SIZE as u64 - 1u64) ;
+        let heap_start_page :Page<Size4KiB>= Page::containing_address(heap_start);
+        let heap_end_page :Page<Size4KiB>=  Page::containing_address(heap_end);
 
-pub fn create_example_mapping(
+        Page::range_inclusive(heap_start_page, heap_end_page)
+    };
+
+    for page in page_range{    
+        let frame = frame_allocator
+        .allocate_frame()
+        .ok_or(MapToError::FrameAllocationFailed)?;
+        let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
+        unsafe{
+            mapper.map_to(page, frame, flags, frame_allocator)?.flush();
+        };
+    }
+    Ok(())
+    //.ok_or()?;
+}
+
+fn create_example_mapping(
     page: Page,
     mapper: &mut OffsetPageTable,
     frame_allocator: &mut impl FrameAllocator<Size4KiB>,
