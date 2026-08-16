@@ -1,8 +1,11 @@
-#![no_std] #![no_main]
+#![no_std] 
+#![no_main]
 #![feature(custom_test_frameworks)]
 #![test_runner(Operating_System::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+
+extern crate alloc;
 
 use x86_64::{
     VirtAddr,
@@ -14,9 +17,10 @@ use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use Operating_System::hlt_loop;
 use bootloader::{BootInfo, entry_point};
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
+use alloc::boxed::Box;
+
 mod vga_buffer;
 mod serial;
-
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> !{
@@ -53,6 +57,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     let mut frame_allocator = unsafe{ memory::BootInfoFrameAllocator::init(&boot_info.memory_map) };
 
     init_heap(&mut mapper, &mut frame_allocator);
+
+    let x = Box::new(10);
     //let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
 
 

@@ -7,7 +7,7 @@ use bootloader::{bootinfo::MemoryMap, BootInfo};
 use bootloader::bootinfo::MemoryRegionType;
 use core::{option::Option, option::Option::Some, option::Option::None};
 
-use crate::println;
+use crate::{allocator::ALLOCATOR, println};
 
 
 
@@ -97,7 +97,7 @@ pub unsafe fn inner_translate_addr(addr:VirtAddr, physical_memory_offset:VirtAdd
     Some(frame.start_address() + u64::from(addr.page_offset()))
 }
 pub fn init_heap(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<(),MapToError<Size4KiB>>{
-
+    
     let page_range = {
         let heap_start = VirtAddr::new(HEAP_START as u64);
         let heap_end =  heap_start + (HEAP_SIZE as u64 - 1u64) ;
@@ -115,6 +115,9 @@ pub fn init_heap(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl 
         unsafe{
             mapper.map_to(page, frame, flags, frame_allocator)?.flush();
         };
+    }
+    unsafe{
+        ALLOCATOR.lock().init(HEAP_START, HEAP_SIZE);
     }
     Ok(())
     //.ok_or()?;
