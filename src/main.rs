@@ -11,13 +11,13 @@ use x86_64::{
     VirtAddr,
 };
 
-use core::{ panic::PanicInfo, arch::asm};
-use Operating_System::{memory::{self, *}, translate_addr};
+use core::{ arch::asm, clone, panic::PanicInfo};
+use Operating_System::{allocator::init_heap, memory::{self, *}, translate_addr};
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use Operating_System::hlt_loop;
 use bootloader::{BootInfo, entry_point};
 use uart_16550::{Config, Uart16550Tty, backend::PioBackend};
-use alloc::boxed::Box;
+use alloc::{boxed::Box, vec, rc::Rc, vec::{Vec}};
 
 mod vga_buffer;
 mod serial;
@@ -52,6 +52,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
         boot_info.physical_memory_offset,
     ];
 
+
     let phys_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
     let mut mapper = unsafe { memory::init(phys_memory_offset)};
     let mut frame_allocator = unsafe{ memory::BootInfoFrameAllocator::init(&boot_info.memory_map) };
@@ -59,6 +60,23 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     init_heap(&mut mapper, &mut frame_allocator);
 
     let x = Box::new(10);
+
+    let mut v:Vec<i32> = Vec::new();
+
+    for i in 1..500{
+        v.push(i);
+    }
+
+    println!("vector: {:?}", v.as_slice());
+
+
+
+    let r = Rc::new(vec!["hi"]);
+    let cloned_r = r.clone();
+    println!("Reference Amount: {}", Rc::strong_count(&cloned_r));
+    core::mem::drop(r);
+    println!("Reference Amount: {}", Rc::strong_count(&cloned_r));
+
     //let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
 
 

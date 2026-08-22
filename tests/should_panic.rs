@@ -3,7 +3,7 @@
 
 use core::panic::PanicInfo;
 
-use Operating_System::{QemuExitCode, exit_qemu, serial_println, serial_print };
+use Operating_System::{exit_qemu, hlt_loop, serial_print, serial_println, QemuExitCode };
 
 
 #[unsafe(no_mangle)]

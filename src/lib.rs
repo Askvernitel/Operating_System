@@ -88,6 +88,7 @@ pub fn test_println_output(){
     let write_str = "Hello World How Are You?";
     use x86_64::instructions::interrupts;
     interrupts::without_interrupts(||{
+        use core::fmt::Write;
         let mut writer = WRITER.lock();
         writeln!(writer, "\n{}",write_str).expect("writeln failed");
         for (i, val) in write_str.chars().enumerate(){
