@@ -12,7 +12,7 @@ use x86_64::{
 };
 
 use core::{ arch::asm, clone, panic::PanicInfo};
-use Operating_System::{allocator::init_heap, memory::{self, *}, translate_addr};
+use Operating_System::{allocator::{init_heap, ALLOCATOR}, memory::{self, *}, translate_addr};
 use crate::vga_buffer::{Color, ColorCode, Writer, WRITER, BUFFER_HEIGHT };
 use Operating_System::hlt_loop;
 use bootloader::{BootInfo, entry_point};

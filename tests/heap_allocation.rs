@@ -58,6 +58,15 @@ fn many_boxes(){
         assert_eq!(*bx, i);
     }
 }
+
+#[test_case]
+fn many_boxes_with_allocation(){
+    let first_bx = Box::new(-1);
+    for i in 1..HEAP_SIZE{
+        let bx = Box::new(i);
+        assert_eq!(*bx, i);
+    }
+}
 #[panic_handler]
 fn panic(info: &PanicInfo) -> !{
     Operating_System::test_panic_handler(info)
